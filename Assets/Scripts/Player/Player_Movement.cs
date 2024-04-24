@@ -12,18 +12,15 @@ public class Player_Movement
     Rigidbody2D _rb;
     public bool jump = true;
 
-    public Player_Movement(Player player)
+    public Player_Movement(Player player , Rigidbody2D rb)
     {
         _player = player;
         _speed = player.speed;
         _jumpForce = player.jumpForce;
-        
-    }
-
-    public void CompleteData(Rigidbody2D rb)
-    {
         _rb = rb;
     }
+
+   
  
     public void Update()
     {
@@ -32,6 +29,8 @@ public class Player_Movement
         Move();
 
         LimitSpeed();
+
+        if (_xAxis == 0) _rb.velocity *= Vector2.up;
     }
 
     void Move()

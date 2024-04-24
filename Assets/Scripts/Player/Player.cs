@@ -40,13 +40,8 @@ public class Player : NetworkBehaviour , IDamageable
     // Start is called before the first frame update
     void Start()
     {
-        _movement = new Player_Movement(this);
-        _inputs = new Player_Inputs();
-        _collisions = new Player_Collisions(_movement);
-        _attacks = new Player_Attacks(this , _grenadePrefab , _wallPrefab);
-
-        _rb = GetComponent<Rigidbody2D>();
-        _movement.CompleteData(_rb);
+        
+        
 
         #region Inputs
         _inputs.BlindKeys(KeyCode.Space, new JumpInput(_movement));
@@ -58,8 +53,12 @@ public class Player : NetworkBehaviour , IDamageable
 
     public override void Spawned()
     {
-       /* _rb = GetComponent<Rigidbody>();
-        _movement.CompleteData(_rb);*/
+        _rb = GetComponent<Rigidbody2D>();
+        _movement = new Player_Movement(this, _rb);
+        _inputs = new Player_Inputs();
+        _collisions = new Player_Collisions(_movement);
+        _attacks = new Player_Attacks(this, _grenadePrefab, _wallPrefab);
+
     }
 
     // Update is called once per frame
