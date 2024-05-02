@@ -8,9 +8,12 @@ public class Wall : NetworkBehaviour, IDamageable
     [SerializeField] int _hp;
     [SerializeField] int _lifeTime;
     float _lifeTimer;
+    public int IDPlayer;
 
-    public void TakeDmg(int dmg)
+
+    public void TakeDmgRpc(int dmg, int ID)
     {
+
         _hp -= dmg;
     }
 

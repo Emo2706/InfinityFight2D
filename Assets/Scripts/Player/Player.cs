@@ -7,6 +7,7 @@ public class Player : NetworkBehaviour , IDamageable
 {
     Rigidbody2D _rb;
     [SerializeField] Pointer _pointer;
+    [SerializeField] GameObject ShootSpawnpoint;
 
     [Header("Bools")]
     public bool hasToJump = false;
@@ -15,8 +16,10 @@ public class Player : NetworkBehaviour , IDamageable
     public bool hasToWall = false;
 
     [Header("Variables")]
+    public int playerID;
     public int speed;
     [SerializeField] int _hp;
+    [SerializeField] int _maxHp;
     public int jumpForce;
     public float shootDistance;
     public float throwForce;
@@ -24,6 +27,7 @@ public class Player : NetworkBehaviour , IDamageable
     public float throwCooldown;
     public float wallCooldown;
 
+    public float delayToRespawn;
 
     
     Player_Movement _movement;
@@ -53,17 +57,28 @@ public class Player : NetworkBehaviour , IDamageable
 
     public override void Spawned()
     {
+        if (!HasStateAuthority) return;
+        HudManager.instance.IDPLAYER.text = Id.ToString();
+
+        _hp = _maxHp;
         _rb = GetComponent<Rigidbody2D>();
         _movement = new Player_Movement(this, _rb);
         _inputs = new Player_Inputs();
         _collisions = new Player_Collisions(_movement);
-        _attacks = new Player_Attacks(this, _grenadePrefab, _wallPrefab);
+        _attacks = new Player_Attacks(this, _grenadePrefab, _wallPrefab, ShootSpawnpoint);
+        Camera.main.GetComponent<CameraBehaviour>().SetParameters(this.gameObject.transform);
+        HudManager.instance.playerRef = this;
+        LocalPlayerDataManager.instance.SetLocalPlayer(this);
+        EventManager.SubscribeToEvent(EventManager.EventsType.Event_PlayerDies, DespawnMethod);
+        EventManager.SubscribeToEvent(EventManager.EventsType.Event_PlayerDies, SpawnTimer);
+        _attacks.SetShootDmg(15);
 
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!HasStateAuthority) return;
         CommandInput keypressed = _inputs.Inputs();
         if (keypressed != null)
         {
@@ -74,7 +89,11 @@ public class Player : NetworkBehaviour , IDamageable
 
         transform.right = direction;
 
+       
+
     }
+    
+   
 
     public override void FixedUpdateNetwork()
     {
@@ -110,15 +129,38 @@ public class Player : NetworkBehaviour , IDamageable
 
     }
 
-    public void TakeDmg(int dmg)
+    public void TakeDmgRpc(int dmg , int ID)
     {
         _hp -= dmg;
+        CheckLife();
     }
 
     void CheckLife()
     {
         if (_hp <= 0)
-            Runner.Despawn(Object);
+            EventManager.TriggerEvent(EventManager.EventsType.Event_PlayerDies, playerID);
+        
+    }
+
+    void DespawnMethod(params object[] parameters)
+    {
+        transform.position = new Vector3(-100, 100, transform.position.z);
+    }
+
+    void SpawnTimer(params object[] parameters)
+    {
+        StartCoroutine(CorroutineSpawnTime());
+    }
+   
+
+    IEnumerator CorroutineSpawnTime()
+    {
+        yield return new WaitForSeconds(delayToRespawn);
+        transform.position = BaseManagers.instance.Bases[playerID].transform.position + BaseManagers.instance.Bases[playerID].offsetSpawnPJ;
+        _hp = _maxHp;
+
+        Camera.main.GetComponent<CameraBehaviour>().SetParameters(this.gameObject.transform);
+        EventManager.TriggerEvent(EventManager.EventsType.Event_PlayerSpawns, playerID);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -131,4 +173,8 @@ public class Player : NetworkBehaviour , IDamageable
     {
         _collisions.OnCollisionExit(collision);
     }
+
+
+
+
 }

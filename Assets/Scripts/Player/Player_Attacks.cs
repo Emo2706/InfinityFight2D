@@ -7,6 +7,7 @@ public class Player_Attacks
     Player _player;
     Grenade _grenadePrefab;
     Wall _wall;
+    GameObject _shootSpawn;
     float _shootDistance;
     float _throwForce;
     float _throwUpWardForce;
@@ -18,7 +19,7 @@ public class Player_Attacks
     float _offsetX = 0.92f;
 
 
-    public Player_Attacks(Player player, Grenade grenadePrefab , Wall wall)
+    public Player_Attacks(Player player, Grenade grenadePrefab , Wall wall, GameObject shootSpawnpoint)
     {
         _player = player;
         _shootDistance = player.shootDistance;
@@ -28,8 +29,12 @@ public class Player_Attacks
         _throwCooldown = player.throwCooldown;
         _wallCooldown = player.wallCooldown;
         _wall = wall;
+        _shootSpawn = shootSpawnpoint;
     }
-
+    public void SetShootDmg(int dmg)
+    {
+        _shootDmg = dmg;
+    }
     public void ShootBool()
     {
         _player.hasToShoot = true;
@@ -37,15 +42,17 @@ public class Player_Attacks
 
     public void Shoot()
     {
-        RaycastHit hit;
-        if (_player.Runner.GetPhysicsScene().Raycast(_player.transform.position, _player.transform.forward, out hit, _shootDistance))
+        var collider = _player.Runner.GetPhysicsScene2D().Raycast(_shootSpawn.gameObject.transform.position, _player.transform.right.normalized, _shootDistance);
+        //if (_player.Runner.GetPhysicsScene2D().Raycast(_shootSpawn.gameObject.transform.position, _player.transform.right.normalized, out hit, _shootDistance)
+        if (collider != null)
         {
-            IDamageable dmg = hit.transform.GetComponent<IDamageable>();
+            //IDamageable dmg = hit.transform.GetComponent<IDamageable>();
+            IDamageable objectdmged = collider.collider.gameObject.GetComponent<IDamageable>();
+            Debug.Log(collider.collider.gameObject.name.ToString() + " fue golpeado");
 
-            if (dmg != null) dmg.TakeDmg(_shootDmg);
+            if (objectdmged != null) objectdmged.TakeDmgRpc(_shootDmg, _player.playerID);
         }
-
-        Debug.Log(hit);
+       
 
     }
 
@@ -90,13 +97,13 @@ public class Player_Attacks
         {
            _wallActivate = false;
 
-           _player.Runner.Spawn(_wall, _player.transform.position + new Vector3((_offsetX * _player.transform.right.x),0));
-
+           Wall wallInstance = _player.Runner.Spawn(_wall, _player.transform.position + new Vector3((_offsetX * _player.transform.right.x),0));
+            wallInstance.IDPlayer = _player.playerID;
            _player.StartCoroutine(ResetWall());
         }
     }
 
-
+    
     IEnumerator ResetWall()
     {
         yield return new WaitForSeconds(_wallCooldown);

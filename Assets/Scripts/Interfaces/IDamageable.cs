@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface IDamageable
 {
-    public abstract void TakeDmg(int dmg); 
+    public abstract void TakeDmgRpc(int dmg, int IDShooter); 
 }

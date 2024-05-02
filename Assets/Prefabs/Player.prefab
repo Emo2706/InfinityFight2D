@@ -31,6 +31,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5275521657852860901}
+  - {fileID: 6387556282845752565}
   m_Father: {fileID: 3488348386243955405}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &839291999631246861
@@ -60,6 +61,7 @@ GameObject:
   - component: {fileID: 6761634339176923956}
   - component: {fileID: 2227505379589619490}
   - component: {fileID: 7657528504133473307}
+  - component: {fileID: -915950822300414915}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -194,18 +196,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _pointer: {fileID: 839291999631246861}
+  ShootSpawnpoint: {fileID: 5824055800612489002}
   hasToJump: 0
   hasToShoot: 0
   hasToGrenade: 0
   hasToWall: 0
+  playerID: 0
   speed: 5
   _hp: 15
+  _maxHp: 15
   jumpForce: 8
   shootDistance: 4
   throwForce: 7
   throwUpWardForce: 5
   throwCooldown: 10
   wallCooldown: 10
+  delayToRespawn: 5
   _grenadePrefab: {fileID: 4802439955350806388, guid: c96787b05d5bd3649b81f94a46907af8, type: 3}
   _wallPrefab: {fileID: 3077378088128057998, guid: b7478060517811442b7e4b31c8a57ac5, type: 3}
   spawnPointGrenade: {fileID: 1259459268145594203}
@@ -227,6 +233,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 6761634339176923956}
+  - {fileID: -915950822300414915}
 --- !u!50 &7657528504133473307
 Rigidbody2D:
   serializedVersion: 4
@@ -254,6 +261,59 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
+--- !u!114 &-915950822300414915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4570348649873850417}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5e690b5fb1084f5ab1c86457af401d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SyncScale: 0
+  SyncParent: 1
+  _interpolationTarget: {fileID: 0}
+  UsePreciseRotation: 0
+  UseRenderSleepThresholds: 1
+  RenderThresholds:
+    UseEnergy: 1
+    Position: 0.01
+    Rotation: 0.01
+    Scale: 0.01
+--- !u!1 &5824055800612489002
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6387556282845752565}
+  m_Layer: 0
+  m_Name: Spawnpoint shooot
+  m_TagString: Untagged
+  m_Icon: {fileID: 3443629218296621865, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6387556282845752565
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5824055800612489002}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.912, y: 0.072515704, z: 0}
+  m_LocalScale: {x: 1.6695595, y: 1.6695595, z: 1.6695595}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6200478088885075134}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6131867341180281004
 GameObject:
   m_ObjectHideFlags: 0

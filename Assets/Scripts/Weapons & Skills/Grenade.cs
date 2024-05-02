@@ -26,11 +26,12 @@ public class Grenade : NetworkBehaviour
 
         RaycastHit hit;
 
+        //Es get physics Scene2D decirle a maty de corregirlo 
         if (Runner.GetPhysicsScene().SphereCast(transform.position, _radius, Vector3.right, out hit))
         {
             IDamageable dmg = hit.transform.GetComponent<IDamageable>();
 
-            if (dmg != null) dmg.TakeDmg(_dmg);
+            //if (dmg != null) dmg.TakeDmgRpc(_dmg, //pasar id del player Por aca);
         }
 
         Runner.Despawn(Object);

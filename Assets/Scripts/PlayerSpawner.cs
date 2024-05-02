@@ -19,10 +19,15 @@ public class PlayerSpawner : SimulationBehaviour , IPlayerJoined
                 if (item == player) break;
                 currentPlayer++;
             }
+            
 
             Vector3 spawnPosition = spawnPoints.Count - 1 <= currentPlayer ? Vector3.zero : spawnPoints[currentPlayer].position;
 
-            Runner.Spawn(playerPref, spawnPosition, Quaternion.identity);
+            Player playerSpawned = Runner.Spawn(playerPref, spawnPosition, Quaternion.identity);
+            playerSpawned.playerID = currentPlayer;
+            //HudManager.instance.PlayerIDAssign(currentPlayer);
+
+            Debug.Log(currentPlayer);
         }
         
     }

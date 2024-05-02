@@ -16,7 +16,7 @@ public class Pointer :MonoBehaviour
 
         transform.rotation = Quaternion.Euler(0, 0, rotZ);
 
-        Debug.Log(mousePos);
+       // Debug.Log(mousePos);
     }
 
 
