@@ -203,15 +203,17 @@ MonoBehaviour:
   hasToWall: 0
   playerID: 0
   speed: 5
+  grenadesAmount: 2
   _hp: 15
   _maxHp: 15
   jumpForce: 8
   shootDistance: 4
-  throwForce: 7
-  throwUpWardForce: 5
+  throwForce: 8
+  throwUpWardForce: 6
   throwCooldown: 10
   wallCooldown: 10
   delayToRespawn: 5
+  _laser: {fileID: -233573440417192155, guid: e7f09b6b9d572fa4bbfc8853d7d70d30, type: 3}
   _grenadePrefab: {fileID: 4802439955350806388, guid: c96787b05d5bd3649b81f94a46907af8, type: 3}
   _wallPrefab: {fileID: 3077378088128057998, guid: b7478060517811442b7e4b31c8a57ac5, type: 3}
   spawnPointGrenade: {fileID: 1259459268145594203}

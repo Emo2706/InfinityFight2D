@@ -13,6 +13,8 @@ public class Grenade : NetworkBehaviour
 
     [SerializeField] int _dmg;
 
+    public int idPlayer;
+
     Collider[] collidersGrenade = new Collider[5];
 
     public override void Spawned()
@@ -24,6 +26,8 @@ public class Grenade : NetworkBehaviour
     {
         yield return new WaitForSeconds(_timeToExplote);
 
+        AudioManager.instance.Play(AudioManager.Sounds.Grenade);
+
         RaycastHit hit;
 
         //Es get physics Scene2D decirle a maty de corregirlo 
@@ -31,7 +35,7 @@ public class Grenade : NetworkBehaviour
         {
             IDamageable dmg = hit.transform.GetComponent<IDamageable>();
 
-            //if (dmg != null) dmg.TakeDmgRpc(_dmg, //pasar id del player Por aca);
+            if (dmg != null) dmg.TakeDmgRpc(_dmg, idPlayer);
         }
 
         Runner.Despawn(Object);

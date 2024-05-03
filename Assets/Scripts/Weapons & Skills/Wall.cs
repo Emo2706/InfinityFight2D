@@ -11,9 +11,9 @@ public class Wall : NetworkBehaviour, IDamageable
     public int IDPlayer;
 
 
-    public void TakeDmgRpc(int dmg, int ID)
+    public void TakeDmgRpc(int dmg , int ID)
     {
-
+        if (IDPlayer == ID) return;
         _hp -= dmg;
     }
 

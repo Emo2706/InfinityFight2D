@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player_Attacks
 {
@@ -17,9 +18,11 @@ public class Player_Attacks
     int _shootDmg;
     bool _wallActivate = true;
     float _offsetX = 0.92f;
+    float _laserDuration = 0.05f;
+    Laser _laser;
+    Image _grenadeImg;
 
-
-    public Player_Attacks(Player player, Grenade grenadePrefab , Wall wall, GameObject shootSpawnpoint)
+    public Player_Attacks(Player player, Grenade grenadePrefab, Wall wall, GameObject shootSpawnpoint, Laser laser)
     {
         _player = player;
         _shootDistance = player.shootDistance;
@@ -30,6 +33,8 @@ public class Player_Attacks
         _wallCooldown = player.wallCooldown;
         _wall = wall;
         _shootSpawn = shootSpawnpoint;
+        _laser = laser;
+        _grenadeImg = player.grenadeImg;
     }
     public void SetShootDmg(int dmg)
     {
@@ -42,18 +47,31 @@ public class Player_Attacks
 
     public void Shoot()
     {
+        AudioManager.instance.Play(AudioManager.Sounds.Shoot);
+
+        _player.StartCoroutine(LaserShoot());
+
         var collider = _player.Runner.GetPhysicsScene2D().Raycast(_shootSpawn.gameObject.transform.position, _player.transform.right.normalized, _shootDistance);
-        //if (_player.Runner.GetPhysicsScene2D().Raycast(_shootSpawn.gameObject.transform.position, _player.transform.right.normalized, out hit, _shootDistance)
-        if (collider != null)
+        if (collider == true)
         {
-            //IDamageable dmg = hit.transform.GetComponent<IDamageable>();
             IDamageable objectdmged = collider.collider.gameObject.GetComponent<IDamageable>();
             Debug.Log(collider.collider.gameObject.name.ToString() + " fue golpeado");
 
-            if (objectdmged != null) objectdmged.TakeDmgRpc(_shootDmg, _player.playerID);
+            if (objectdmged != null) objectdmged.TakeDmgRpc(_shootDmg , _player.playerID);
         }
-       
 
+
+    }
+
+
+    
+    IEnumerator LaserShoot()
+    {
+       var laserShoot =  _player.Runner.Spawn(_laser, _shootSpawn.transform.position , _player.transform.rotation);
+
+        yield return new WaitForSeconds(_laserDuration);
+
+        _player.Runner.Despawn(laserShoot);
     }
 
     public void GrenadeBool()
@@ -61,13 +79,23 @@ public class Player_Attacks
         _player.hasToGrenade = true;
     }
 
+
+    
     public void Grenade()
     {
-        if(_throw== true)
+        if(_throw== true && _player.grenadesAmount>0)
         {
             _throw = false;
 
+            _player.grenadesAmount--;
+
+            _grenadeImg.fillAmount = 0;
+
+            HudManager.instance.ChangeGrenadesCount(_player.grenadesAmount);
+
             Grenade grenade = _player.Runner.Spawn(_grenadePrefab, _player.spawnPointGrenade.position);
+
+            grenade.idPlayer = _player.playerID;
 
             Rigidbody2D grenadeRb = grenade.GetComponent<Rigidbody2D>();
 
@@ -81,10 +109,13 @@ public class Player_Attacks
 
     IEnumerator ResetThrow()
     {
+       
         yield return new WaitForSeconds(_throwCooldown);
 
         _throw = true;
     }
+
+    
 
     public void WallBool()
     {
@@ -97,7 +128,7 @@ public class Player_Attacks
         {
            _wallActivate = false;
 
-           Wall wallInstance = _player.Runner.Spawn(_wall, _player.transform.position + new Vector3((_offsetX * _player.transform.right.x),0));
+            Wall wallInstance = _player.Runner.Spawn(_wall, _player.transform.position + new Vector3((_offsetX * _player.transform.right.x),0));
             wallInstance.IDPlayer = _player.playerID;
            _player.StartCoroutine(ResetWall());
         }

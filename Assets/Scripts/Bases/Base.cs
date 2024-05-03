@@ -24,18 +24,13 @@ public class Base : NetworkBehaviour , IDamageable
             forceField.TurnFieldOn();
     }
 
-    
-    private void Update()
-    {
-      
-    }
-
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void TakeDmgRpc(int dmg, int IDShooter)
     {
         if (IDShooter == ID) return;
         _hp -= dmg;
         HudManager.instance.BaseReceivesDMG(_hp, ID);
+        AudioManager.instance.Play(AudioManager.Sounds.BaseDmg);
     }
 
    

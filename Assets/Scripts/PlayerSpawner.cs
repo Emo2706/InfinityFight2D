@@ -10,18 +10,18 @@ public class PlayerSpawner : SimulationBehaviour , IPlayerJoined
 
     public void PlayerJoined(PlayerRef player)
     {
+        
         if (player == Runner.LocalPlayer)
         {
-            int currentPlayer = 0;
+            int currentPlayer = -1;
 
             foreach (var item in Runner.ActivePlayers)
             {
-                if (item == player) break;
                 currentPlayer++;
             }
             
 
-            Vector3 spawnPosition = spawnPoints.Count - 1 <= currentPlayer ? Vector3.zero : spawnPoints[currentPlayer].position;
+            Vector3 spawnPosition = spawnPoints.Count - 1 < currentPlayer ? Vector3.zero : spawnPoints[currentPlayer].position;
 
             Player playerSpawned = Runner.Spawn(playerPref, spawnPosition, Quaternion.identity);
             playerSpawned.playerID = currentPlayer;

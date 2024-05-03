@@ -15,18 +15,10 @@ public class LocalPlayerDataManager : MonoBehaviour
 
         }
     }
-    void Start()
-    {
-        
-    }
-
+    
     public void SetLocalPlayer(Player py)
     {
         LocalPlayer = py;
     }
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 }
