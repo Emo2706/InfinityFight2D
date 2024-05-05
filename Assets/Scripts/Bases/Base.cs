@@ -15,6 +15,12 @@ public class Base : NetworkBehaviour , IDamageable
     private void Start()
     {
         EventManager.SubscribeToEvent(EventManager.EventsType.Event_PlayerSpawns, TurnFieldOn);
+
+        HudManager.instance.MyBaseLifeSlider.maxValue = _hp;
+        HudManager.instance.MyBaseLifeSlider.value = _hp;
+        HudManager.instance.EnemyBaseLifeSlider.value = 0;
+        HudManager.instance.EnemyBaseLifeSlider.maxValue = _hp;
+
     }
 
     void TurnFieldOn(params object[] parameters)

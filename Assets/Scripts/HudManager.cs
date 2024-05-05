@@ -14,10 +14,12 @@ public class HudManager : MonoBehaviour
     public TMP_Text MyBaseLifeText;
     public TMP_Text IDPLAYER;
     public TMP_Text grenadesCount;
+    public TMP_Text VidaTest;
     public Image grenadeImg;
     public Slider MyBaseLifeSlider;
     public Slider EnemyBaseLifeSlider;
     int ID;
+
 
     
     // Start is called before the first frame update
@@ -40,6 +42,8 @@ public class HudManager : MonoBehaviour
     {
         ID = IDPlayer;
     }
+
+    
    /* public void ChangeText(int number)
     {
         EnemyLifeText.text = number.ToString();
@@ -51,7 +55,7 @@ public class HudManager : MonoBehaviour
         {
             MyBaseLifeSlider.value = vida;
         }
-        else EnemyBaseLifeSlider.value = vida;
+        else EnemyBaseLifeSlider.value = EnemyBaseLifeSlider.maxValue - vida;
 
        
     }
