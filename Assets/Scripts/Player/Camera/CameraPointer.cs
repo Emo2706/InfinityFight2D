@@ -24,6 +24,7 @@ public class CameraPointer : MonoBehaviour
         {
             direction = direction.normalized * threshhold;
         }
-        transform.position = new Vector3(player.position.x + direction.x, (player.position.y + direction.y)* yLimitIncreaser);
+        //transform.position = new Vector3(player.position.x + direction.x, (player.position.y + direction.y)* yLimitIncreaser);
+        transform.position = new Vector3(player.position.x + direction.x, (player.position.y + direction.y));
     }
 }

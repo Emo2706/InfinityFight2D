@@ -9,6 +9,8 @@ public abstract class EventManager : MonoBehaviour
     {
         Event_PlayerSpawns,
         Event_PlayerDies,
+        Event_GameOver,
+        Event_StartGame,
         
 
 

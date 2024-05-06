@@ -9,7 +9,7 @@ public class HudManager : MonoBehaviour
 {
     
     public static HudManager instance;
-    public Player playerRef;
+    [HideInInspector] public Player playerRef;
     public TMP_Text EnemyLifeText;
     public TMP_Text MyBaseLifeText;
     public TMP_Text IDPLAYER;
@@ -18,6 +18,9 @@ public class HudManager : MonoBehaviour
     public Image grenadeImg;
     public Slider MyBaseLifeSlider;
     public Slider EnemyBaseLifeSlider;
+
+    [SerializeField] GameObject WinScreen;
+    [SerializeField] GameObject LoseScreen;
     int ID;
 
 
@@ -37,7 +40,10 @@ public class HudManager : MonoBehaviour
         if (!playerRef) return;
         IDPLAYER.text = playerRef.playerID.ToString();
     }
-
+    private void Start()
+    {
+        EventManager.SubscribeToEvent(EventManager.EventsType.Event_GameOver, ShowGameOverScene);
+    }
     public void PlayerIDAssign(int IDPlayer)
     {
         ID = IDPlayer;
@@ -63,6 +69,19 @@ public class HudManager : MonoBehaviour
     public void ChangeGrenadesCount(int number)
     {
         grenadesCount.text = number.ToString();
+    }
+
+    void ShowGameOverScene(params object[] parameters)
+    {
+        //Si me pasan mi ID, quiere decir que destruyeron mi base
+        if ((int)parameters[0] == LocalPlayerDataManager.instance.LocalPlayer.playerID)
+        {
+            LoseScreen.gameObject.SetActive(true);
+        }
+        else WinScreen.gameObject.SetActive(true);
+        
+
+
     }
     
 }

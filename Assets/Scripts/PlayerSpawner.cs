@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
+using System.Linq;
 
 public class PlayerSpawner : SimulationBehaviour , IPlayerJoined
 {
@@ -10,26 +11,39 @@ public class PlayerSpawner : SimulationBehaviour , IPlayerJoined
 
     public void PlayerJoined(PlayerRef player)
     {
-        
+        int currentPlayer = -1;
+
         if (player == Runner.LocalPlayer)
         {
-            int currentPlayer = -1;
+
 
             foreach (var item in Runner.ActivePlayers)
             {
                 currentPlayer++;
             }
+            //Vector3 spawnPosition = spawnPoints.Count - 1 < currentPlayer ? Vector3.zero : GameManager.instance.LobbySpawnPoints[currentPlayer + 1].position;
+
+            Player playerSpawned = Runner.Spawn(playerPref, Vector3.zero, Quaternion.identity);
             
 
-            Vector3 spawnPosition = spawnPoints.Count - 1 < currentPlayer ? Vector3.zero : spawnPoints[currentPlayer].position;
-
-            Player playerSpawned = Runner.Spawn(playerPref, spawnPosition, Quaternion.identity);
             playerSpawned.playerID = currentPlayer;
+            playerSpawned.gameObject.transform.position = GameManager.instance.LobbySpawnPoints[playerSpawned.playerID].position;
+
+            
+
             //HudManager.instance.PlayerIDAssign(currentPlayer);
 
-            Debug.Log(currentPlayer);
         }
-        
+        RpcStartGame(currentPlayer); 
+
+    }
+
+    void RpcStartGame(int currentplayer)
+    {
+        if (currentplayer >= 1)
+        {
+            EventManager.TriggerEvent(EventManager.EventsType.Event_StartGame);
+        }
     }
 
    

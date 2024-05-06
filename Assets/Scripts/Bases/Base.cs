@@ -37,6 +37,15 @@ public class Base : NetworkBehaviour , IDamageable
         _hp -= dmg;
         HudManager.instance.BaseReceivesDMG(_hp, ID);
         AudioManager.instance.Play(AudioManager.Sounds.BaseDmg);
+        CheckBaseLife();
+    }
+
+    void CheckBaseLife()
+    {
+        if(_hp <= 0)
+        {
+            EventManager.TriggerEvent(EventManager.EventsType.Event_GameOver, ID);
+        }
     }
 
    

@@ -50,12 +50,16 @@ public class Player : NetworkBehaviour , IDamageable
     public int grenadesAmount;
     public Image grenadeImg;
 
-   
+    public Action CurrentSpawnMethod;
 
 
     public override void Spawned()
     {
         _Lr = GetComponent<LineRenderer>();
+        //addToPlayersList();
+        EventManager.SubscribeToEvent(EventManager.EventsType.Event_StartGame, StartGameStateForPlayer);
+        CurrentSpawnMethod = LobbySpawnMethod;
+
         if (!HasStateAuthority) return;
         HudManager.instance.IDPLAYER.text = Id.ToString();
         grenadeImg = HudManager.instance.grenadeImg;
@@ -71,9 +75,10 @@ public class Player : NetworkBehaviour , IDamageable
         LocalPlayerDataManager.instance.SetLocalPlayer(this);
         EventManager.SubscribeToEvent(EventManager.EventsType.Event_PlayerDies, DespawnMethod);
         EventManager.SubscribeToEvent(EventManager.EventsType.Event_PlayerDies, SpawnTimer);
-        _attacks.SetShootDmg(5);
-        HudManager.instance.ChangeGrenadesCount(grenadesAmount);
 
+        _attacks.SetShootDmg(5);
+
+        HudManager.instance.ChangeGrenadesCount(grenadesAmount);
 
         #region Inputs
         _inputs.BlindKeys(KeyCode.Space, new JumpInput(_movement));
@@ -84,7 +89,13 @@ public class Player : NetworkBehaviour , IDamageable
 
     }
 
-    // Update is called once per frame
+    /* No se puede con RPC, tira error
+    void addToPlayersList()
+    {
+        GameManager.instance.playersList.Add(this);
+
+    }*/
+
     void Update()
     {
         if (!HasStateAuthority) return;
@@ -180,12 +191,25 @@ public class Player : NetworkBehaviour , IDamageable
     IEnumerator CorroutineSpawnTime()
     {
         yield return new WaitForSeconds(delayToRespawn);
-        transform.position = BaseManagers.instance.Bases[playerID].transform.position + BaseManagers.instance.Bases[playerID].offsetSpawnPJ;
+        CurrentSpawnMethod();
         _hp = _maxHp;
 
         Camera.main.GetComponent<CameraBehaviour>().SetParameters(this.gameObject.transform);
         EventManager.TriggerEvent(EventManager.EventsType.Event_PlayerSpawns, playerID);
     }
+
+
+
+    public void InGameSpawnMethod()
+    {
+        transform.position = BaseManagers.instance.Bases[playerID].transform.position + BaseManagers.instance.Bases[playerID].offsetSpawnPJ;
+
+    }
+    void LobbySpawnMethod()
+    {
+        transform.position = GameManager.instance.LobbySpawnPoints[playerID].position;
+    }
+
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
@@ -211,13 +235,31 @@ public class Player : NetworkBehaviour , IDamageable
         StartCoroutine(ActivateAndDesactiveLineRendererCorroutine(time, _Lr));
     }
 
+
+    public void StartGameStateForPlayer(params object[] p)
+    {
+        Debug.Log("sexo");
+        Debug.Log("sexo");
+        Debug.Log("PAJERO ANDA");
+        Debug.Log("sexo");
+        Debug.Log("sexo");
+        Debug.Log("sexo");
+        InGameSpawnMethod();
+        CurrentSpawnMethod = InGameSpawnMethod;
+        _hp = _maxHp;
+        grenadesAmount = 2;
+        HudManager.instance.ChangeGrenadesCount(grenadesAmount);
+
+       
+        
+    }
+
     
 
     IEnumerator ActivateAndDesactiveLineRendererCorroutine(float tim, LineRenderer _lr)
     {
         _lr.enabled = true;
-        //yield return new WaitForSeconds(_laserDuration);
-        yield return new WaitForSeconds(10);
+        yield return new WaitForSeconds(tim);
         _lr.enabled = false;
     }
 
@@ -227,6 +269,9 @@ public class Player : NetworkBehaviour , IDamageable
     {
         VoidToExecuteRpc();
     }*/
+   
+
+   
 
 
 
