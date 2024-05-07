@@ -17,6 +17,8 @@ public class HudManager : MonoBehaviour
     public TMP_Text IDPLAYER;
     public TMP_Text grenadesCount;
     public TMP_Text VidaTest;
+    [SerializeField] TMP_Text _respawningText;
+    public TMP_Text BufoText;
 
     [Header("Images")]
     public Image grenadeImg;
@@ -50,6 +52,8 @@ public class HudManager : MonoBehaviour
     private void Start()
     {
         EventManager.SubscribeToEvent(EventManager.EventsType.Event_GameOver, ShowGameOverScene);
+        EventManager.SubscribeToEvent(EventManager.EventsType.Event_PlayerDies, PlayerDied);
+        EventManager.SubscribeToEvent(EventManager.EventsType.Event_PlayerSpawns, PlayerRespawned);
     }
     public void PlayerIDAssign(int IDPlayer)
     {
@@ -91,4 +95,29 @@ public class HudManager : MonoBehaviour
 
     }
     
+    void PlayerDied(params object[] parameters)
+    {
+        if ((int)parameters[0] == LocalPlayerDataManager.instance.LocalPlayer.playerID)
+        {
+            _respawningText.gameObject.SetActive(true);
+        }
+    }
+    void PlayerRespawned(params object[] parameters)
+    {
+        if ((int)parameters[0] == LocalPlayerDataManager.instance.LocalPlayer.playerID)
+        {
+            _respawningText.gameObject.SetActive(false);
+            StartCoroutine(BuffPopupText());
+        }
+    }
+
+    IEnumerator BuffPopupText()
+    {
+        BufoText.gameObject.SetActive(true);
+        float tiempoParaDesaparecer = 3;
+        yield return new WaitForSeconds(tiempoParaDesaparecer);
+        BufoText.gameObject.SetActive(false);
+
+
+    }
 }

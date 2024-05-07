@@ -43,8 +43,9 @@ public class StartButton : NetworkObject
         //CheckPlayersReadyRpc(true);
         //GameManager.instance.PlayerReady(true);
 
-        playersReady++;
-        playersReadyChanged(playersReady);
+        //playersReady++;
+        //playersReadyChanged(playersReady);
+        RPC_CheckPlayersReady(true);
         playersReadyText.text = playersReady.ToString() + "/2";
 
 
@@ -58,17 +59,31 @@ public class StartButton : NetworkObject
         if (collision.gameObject.GetComponent<Player>() == null) return;
         //GameManager.instance.PlayerReady(false);
         //CheckPlayersReady(false);
+        RPC_CheckPlayersReady(false);
 
         playersReadyText.text = playersReady.ToString() + "/2";
 
     }
 
-    
-    void CheckPlayersReadyRpc(bool trueornot)
+
+    /*void CheckPlayersReadyRpc(bool trueornot)
     {
         if (trueornot) playersReady++;
         else playersReady--;
 
+    }*/
+    [Rpc(RpcSources.All, RpcTargets.All)]
+
+    void RPC_CheckPlayersReady(bool trueornot)
+    {
+        if (!HasStateAuthority) return;
+        
+
+        
+        if (trueornot) playersReady++;
+        else playersReady--;
+
+        if (playersReady >= 2) EventManager.TriggerEvent(EventManager.EventsType.Event_StartGame);
     }
 
     void CheckPlayersReady()

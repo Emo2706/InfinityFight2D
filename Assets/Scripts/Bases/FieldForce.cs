@@ -18,30 +18,35 @@ public class FieldForce : NetworkBehaviour
 
     public override void Spawned()
     {
+        if (!HasStateAuthority) return;
+
         _SRforceField = gameObject.GetComponent<SpriteRenderer>();
         _fieldColor = _SRforceField.material.color;
-        gameObject.SetActive(false);
+        RPCShieldGameObject(false);
+
+
     }
     void Start()
     {
         
     }
 
-   // [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+   [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
 
-   public void TurnFieldOn()
+   public void RPCTurnFieldOn()
     {
-       
+        if (!HasStateAuthority) return;
+
         StartCoroutine(TurnFieldOnCorroutine());
     }
 
-    //NO ME DEJA PONER RPC EN NINGUNO DE LOS 2
-    //[Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+   
 
     
     IEnumerator TurnFieldOnCorroutine()
     {
-        gameObject.SetActive(true);
+        RPCShieldGameObject(true);
+
         WaitForSeconds waitBlink = new WaitForSeconds(_durationBetweenBlinks);
 
         yield return new WaitForSeconds (liveTime);
@@ -54,14 +59,23 @@ public class FieldForce : NetworkBehaviour
 
 
         }
-        gameObject.SetActive(false);
+        RPCShieldGameObject(false);
 
 
     }
+  
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    void RPCShieldGameObject(bool onof)
+    {
+        if (!HasStateAuthority) return;
+
+        gameObject.SetActive(onof);
+    }
+    
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (!HasStateAuthority) return;
+        //if (!HasStateAuthority) return;
 
         if (collision.TryGetComponent(out Player player))
         {

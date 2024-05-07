@@ -4,17 +4,22 @@ using UnityEngine;
 using Fusion;
 
 
-public class Base : NetworkBehaviour , IDamageable
+public class Base : NetworkBehaviour, IDamageable
 {
-   [SerializeField] int _hp;
+    [SerializeField] int _hp;
     [SerializeField] int ID;
     public Vector3 offsetSpawnPJ;
     public FieldForce forceField;
-    
+    bool _IsProtected = true;
+
 
     private void Start()
     {
+        _IsProtected = true;
+        EventManager.SubscribeToEvent(EventManager.EventsType.Event_PlayerDies, MyPlayerDies);
+
         EventManager.SubscribeToEvent(EventManager.EventsType.Event_PlayerSpawns, TurnFieldOn);
+        EventManager.SubscribeToEvent(EventManager.EventsType.Event_PlayerSpawns, MyPlayerRespawns);
 
         HudManager.instance.MyBaseLifeSlider.maxValue = _hp;
         HudManager.instance.MyBaseLifeSlider.value = _hp;
@@ -26,14 +31,18 @@ public class Base : NetworkBehaviour , IDamageable
     void TurnFieldOn(params object[] parameters)
     {
         if ((int)parameters[0] == ID)
-            forceField.gameObject.SetActive(true);
-            forceField.TurnFieldOn();
+        {
+            //forceField.gameObject.SetActive(true);
+            //forceField.RPCTurnFieldOn();
+        }
+
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void TakeDmgRpc(int dmg, int IDShooter)
     {
         if (IDShooter == ID) return;
+        if (_IsProtected) return;
         _hp -= dmg;
         HudManager.instance.BaseReceivesDMG(_hp, ID);
         AudioManager.instance.Play(AudioManager.Sounds.BaseDmg);
@@ -42,13 +51,34 @@ public class Base : NetworkBehaviour , IDamageable
 
     void CheckBaseLife()
     {
-        if(_hp <= 0)
+        if (_hp <= 0)
         {
             EventManager.TriggerEvent(EventManager.EventsType.Event_GameOver, ID);
         }
     }
 
-   
+    void MyPlayerDies(params object[] parameters)
+    {
+        if ((int)parameters[0] == ID)
+            RPCProtectBase(false);
 
-    
+    }
+
+    void MyPlayerRespawns(params object[] parameters)
+    {
+        if ((int)parameters[0] == ID)
+            RPCProtectBase(true);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    void RPCProtectBase(bool trueorfalse)
+    {
+        _IsProtected = trueorfalse;
+
+    }
+
+
+
+
+
 }

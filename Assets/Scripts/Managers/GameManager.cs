@@ -14,7 +14,7 @@ public class GameManager : NetworkBehaviour
     // Start is called before the first frame update
     private void Awake()
     {
-       if (!HasStateAuthority) return;
+       //if (!HasStateAuthority) return;
         if (instance == null)
         {
             

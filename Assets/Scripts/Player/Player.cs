@@ -9,6 +9,7 @@ public class Player : NetworkBehaviour , IDamageable
 {
     Rigidbody2D _rb;
     LineRenderer _Lr;
+    BoxCollider2D _Bc;
     [SerializeField] Pointer _pointer;
     [SerializeField] GameObject ShootSpawnpoint;
 
@@ -69,19 +70,24 @@ public class Player : NetworkBehaviour , IDamageable
         _Lr = GetComponent<LineRenderer>();
         //addToPlayersList();
         EventManager.SubscribeToEvent(EventManager.EventsType.Event_StartGame, StartGameStateForPlayer);
-        CurrentSpawnMethod = LobbySpawnMethod;
 
+        CurrentSpawnMethod = InGameSpawnMethod;
+        
         if (!HasStateAuthority) return;
+        
+       
+
+
         HudManager.instance.IDPLAYER.text = Id.ToString();
         grenadeImg = HudManager.instance.grenadeImg;
         wallImg = HudManager.instance.wallImg;
-
+        _Bc = gameObject.GetComponent<BoxCollider2D>();
         _hp = _maxHp;
         _rb = GetComponent<Rigidbody2D>();
         _movement = new Player_Movement(this, _rb);
         _inputs = new Player_Inputs();
         _collisions = new Player_Collisions(_movement);
-        _attacks = new Player_Attacks(this, _grenadePrefab, _wallPrefab, ShootSpawnpoint , _laser, _Lr);
+        _attacks = new Player_Attacks(this, _grenadePrefab, _wallPrefab, ShootSpawnpoint , _laser, _Lr, _Bc);
         _view = new PlayerView(this);
         Camera.main.GetComponent<CameraBehaviour>().SetParameters(this.gameObject.transform);
         HudManager.instance.playerRef = this;
@@ -151,9 +157,9 @@ public class Player : NetworkBehaviour , IDamageable
             keypressed.Execute();
         }
 
-       /* Vector3 direction = new Vector3(_pointer.mousePos.x - transform.position.x, _pointer.mousePos.y - transform.position.y);
-
-        transform.right = direction;*/
+       Vector3 direction = new Vector3(_pointer.mousePos.x - transform.position.x, _pointer.mousePos.y - transform.position.y);
+        _pointer.gameObject.transform.right = direction;
+        //transform.right = direction;*/
 
         if (grenadeImg.fillAmount < 1)
         {
@@ -165,6 +171,11 @@ public class Player : NetworkBehaviour , IDamageable
             _view.RechargeFillWall();
         }
 
+        if (Input.GetKeyDown(KeyCode.Y))
+        {
+            LobbySpawnMethod();
+        }
+        
     }
     
    
@@ -212,10 +223,11 @@ public class Player : NetworkBehaviour , IDamageable
        
         _hp -= dmg;
         AudioManager.instance.Play(AudioManager.Sounds.Dmg);
-        CheckLife();
+        RPCCheckLife();
     }
+    [Rpc(RpcSources.All, RpcTargets.All)]
 
-    void CheckLife()
+    void RPCCheckLife()
     {
         HudManager.instance.VidaTest.text = _hp.ToString();
         if (_hp <= 0)
@@ -228,7 +240,6 @@ public class Player : NetworkBehaviour , IDamageable
         transform.position = new Vector3(-100, 100, transform.position.z);
         grenadesAmount = 3;
         _view.ChangeGrenades();
-        Buff();
 
     }
 
@@ -249,12 +260,14 @@ public class Player : NetworkBehaviour , IDamageable
     {
         speed += 2;
 
+        HudManager.instance.BufoText.text = "CLON MEJORADO! + VELOCIDAD";
         Debug.Log("Speed up");
     }
 
     void ShootDistanceUp()
     {
         shootDistance += 1;
+        HudManager.instance.BufoText.text = "CLON MEJORADO! + ALCANCE DE DISPARO";
 
         Debug.Log("Distance up");
     }
@@ -262,6 +275,7 @@ public class Player : NetworkBehaviour , IDamageable
     void LessThrowCooldown()
     {
         throwCooldown -= 2;
+        HudManager.instance.BufoText.text = "CLON MEJORADO! - COOLDOWN DE GRANADA";
 
         Debug.Log("GrenadeCooldown down");
     }
@@ -269,6 +283,7 @@ public class Player : NetworkBehaviour , IDamageable
     void DmgUp()
     {
         _attacks.SetShootDmg(_shootDmg+=1);
+        HudManager.instance.BufoText.text = "CLON MEJORADO! + DAÑO DE DISPARO";
 
         Debug.Log("Damage up");
     }
@@ -276,6 +291,7 @@ public class Player : NetworkBehaviour , IDamageable
     void LessWallCooldown()
     {
         wallCooldown -= 1;
+        HudManager.instance.BufoText.text = "CLON MEJORADO! - COOLDOWN DE PARED";
 
         Debug.Log("WallCooldown down");
     }
@@ -283,10 +299,22 @@ public class Player : NetworkBehaviour , IDamageable
     IEnumerator CorroutineSpawnTime()
     {
         yield return new WaitForSeconds(delayToRespawn);
-        CurrentSpawnMethod();
+        Camera.main.GetComponent<CameraBehaviour>().SetParameters(this.gameObject.transform);
+        RPCPlayerRespawns();
+        /*CurrentSpawnMethod();
         _hp = _maxHp;
 
-        Camera.main.GetComponent<CameraBehaviour>().SetParameters(this.gameObject.transform);
+        EventManager.TriggerEvent(EventManager.EventsType.Event_PlayerSpawns, playerID);*/
+    }
+    [Rpc(RpcSources.All, RpcTargets.All)]
+
+    void RPCPlayerRespawns()
+    {
+        CurrentSpawnMethod();
+       _hp = _maxHp;
+        Buff();
+
+
         EventManager.TriggerEvent(EventManager.EventsType.Event_PlayerSpawns, playerID);
     }
 
@@ -326,16 +354,11 @@ public class Player : NetworkBehaviour , IDamageable
 
         StartCoroutine(ActivateAndDesactiveLineRendererCorroutine(time, _Lr));
     }
-
+    
 
     public void StartGameStateForPlayer(params object[] p)
     {
-        Debug.Log("sexo");
-        Debug.Log("sexo");
-        Debug.Log("PAJERO ANDA");
-        Debug.Log("sexo");
-        Debug.Log("sexo");
-        Debug.Log("sexo");
+        
         InGameSpawnMethod();
         CurrentSpawnMethod = InGameSpawnMethod;
         _hp = _maxHp;
@@ -359,9 +382,8 @@ public class Player : NetworkBehaviour , IDamageable
     {
         VoidToExecuteRpc();
     }*/
-   
 
-   
+    
 
 
 

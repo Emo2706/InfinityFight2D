@@ -21,12 +21,13 @@ public class Player_Attacks
     Laser _laser;
     
     LineRenderer _lr;
+    BoxCollider2D _bc;
 
     public event Action OnThrow = delegate { };
     public event Action OnResetThrow = delegate { };
     public event Action OnWall = delegate { };
 
-    public Player_Attacks(Player player, Grenade grenadePrefab, Wall wall, GameObject shootSpawnpoint, Laser laser, LineRenderer Line)
+    public Player_Attacks(Player player, Grenade grenadePrefab, Wall wall, GameObject shootSpawnpoint, Laser laser, LineRenderer Line, BoxCollider2D box)
     {
         _player = player;
         _grenadePrefab = grenadePrefab;
@@ -36,6 +37,7 @@ public class Player_Attacks
         _shootSpawn = shootSpawnpoint;
         _laser = laser;
         _lr = Line;
+        _bc = box;
     }
     public void SetShootDmg(int dmg)
     {

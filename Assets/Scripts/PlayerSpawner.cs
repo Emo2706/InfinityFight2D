@@ -27,6 +27,7 @@ public class PlayerSpawner : SimulationBehaviour , IPlayerJoined
      
             playerSpawned.playerID = currentPlayer;
 
+
             playerSpawned.blue = currentPlayer == 1 ? true : false;
             //playerSpawned.gameObject.transform.position = GameManager.instance.LobbySpawnPoints[playerSpawned.playerID].position;
 
@@ -35,11 +36,11 @@ public class PlayerSpawner : SimulationBehaviour , IPlayerJoined
             //HudManager.instance.PlayerIDAssign(currentPlayer);
 
         }
-        RpcStartGame(currentPlayer); 
+        RPC_StartGame(currentPlayer); 
 
     }
-
-    void RpcStartGame(int currentplayer)
+    //[Rpc(RpcSources.All, RpcTargets.All)] no te deja
+    void RPC_StartGame(int currentplayer)
     {
         if (currentplayer >= 1)
         {
