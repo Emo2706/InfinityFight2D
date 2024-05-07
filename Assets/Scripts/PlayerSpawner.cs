@@ -7,6 +7,7 @@ using System.Linq;
 public class PlayerSpawner : SimulationBehaviour , IPlayerJoined
 {
     [SerializeField] Player playerPref;
+    public List<Sprite> spritesPlayer = new List<Sprite>();
     public List<Transform> spawnPoints = new List<Transform>();
 
     public void PlayerJoined(PlayerRef player)
@@ -21,13 +22,16 @@ public class PlayerSpawner : SimulationBehaviour , IPlayerJoined
             {
                 currentPlayer++;
             }
-            //Vector3 spawnPosition = spawnPoints.Count - 1 < currentPlayer ? Vector3.zero : GameManager.instance.LobbySpawnPoints[currentPlayer + 1].position;
+            Vector3 spawnPosition = spawnPoints.Count - 1 < currentPlayer ? Vector3.zero : spawnPoints[currentPlayer].position;
 
-            Player playerSpawned = Runner.Spawn(playerPref, Vector3.zero, Quaternion.identity);
-            
-
+            Player playerSpawned = Runner.Spawn(playerPref, spawnPosition, Quaternion.identity);
+     
             playerSpawned.playerID = currentPlayer;
-            playerSpawned.gameObject.transform.position = GameManager.instance.LobbySpawnPoints[playerSpawned.playerID].position;
+
+            playerSpawned.GetComponentInChildren<SpriteRenderer>().sprite = spritesPlayer[currentPlayer];
+
+            playerSpawned.blue = currentPlayer == 1 ? true : false;
+            //playerSpawned.gameObject.transform.position = GameManager.instance.LobbySpawnPoints[playerSpawned.playerID].position;
 
             
 

@@ -10,12 +10,19 @@ public class HudManager : MonoBehaviour
     
     public static HudManager instance;
     [HideInInspector] public Player playerRef;
+
+    [Header("Texts")]
     public TMP_Text EnemyLifeText;
     public TMP_Text MyBaseLifeText;
     public TMP_Text IDPLAYER;
     public TMP_Text grenadesCount;
     public TMP_Text VidaTest;
+
+    [Header("Images")]
     public Image grenadeImg;
+    public Image wallImg;
+    
+    [Header("Sliders")]
     public Slider MyBaseLifeSlider;
     public Slider EnemyBaseLifeSlider;
 

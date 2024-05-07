@@ -32,11 +32,7 @@ public class CameraBehaviour : MonoBehaviour
             target = BaseManagers.instance.Bases[LocalPlayerDataManager.instance.LocalPlayer.playerID].transform;
         }
     }
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 
     private void LateUpdate()
     {
@@ -49,5 +45,34 @@ public class CameraBehaviour : MonoBehaviour
         float ZOffset = -10;
         Vector3 targetOffset = new Vector3(target.position.x, target.position.y, ZOffset); 
         transform.position = Vector3.Lerp(transform.position, targetOffset, _cameraSpeed);
+    }
+
+    public void Shake(float duration , float magnitude)
+    {
+        StartCoroutine(ShakeCourotine(duration, magnitude));
+    }
+
+    public IEnumerator ShakeCourotine(float duration, float magnitude)
+    {
+        Vector3 originalPosition = transform.localPosition;
+
+        float elapsed = 0.0f;
+
+        while (elapsed < duration)
+        {
+            float x = UnityEngine.Random.Range(-1f, 1f) * magnitude;
+
+            float y = UnityEngine.Random.Range(-1f, 1f) * magnitude;
+
+            transform.localPosition = new Vector3(originalPosition.x, y, originalPosition.z);
+
+            elapsed += Time.deltaTime;
+
+            yield return null;
+
+            Debug.Log("Shake");
+        }
+
+        transform.localPosition = originalPosition;
     }
 }

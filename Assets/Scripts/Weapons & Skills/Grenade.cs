@@ -8,8 +8,14 @@ public class Grenade : NetworkBehaviour
     [SerializeField] int _timeToExplote;
 
     [SerializeField] float _radius;
+    
+    [SerializeField] float _distance;
+    
+    [SerializeField] float _shakeMagnitude;
+    
+    [SerializeField] float _shakeDuration;
 
-    [SerializeField] LayerMask _layerMask;
+    [SerializeField] LayerMask _layerMask = 1 << 7;
 
     [SerializeField] int _dmg;
 
@@ -26,16 +32,27 @@ public class Grenade : NetworkBehaviour
     {
         yield return new WaitForSeconds(_timeToExplote);
 
+        Camera.main.GetComponent<CameraBehaviour>().Shake(_shakeDuration, _shakeMagnitude);
+
         AudioManager.instance.Play(AudioManager.Sounds.Grenade);
 
-        RaycastHit hit;
+        
 
         //Es get physics Scene2D decirle a maty de corregirlo 
-        if (Runner.GetPhysicsScene().SphereCast(transform.position, _radius, Vector3.right, out hit))
+        /*if (Runner.GetPhysicsScene2D().CircleCast(transform.position, _radius, Vector2.right , _distance))
         {
             IDamageable dmg = hit.transform.GetComponent<IDamageable>();
 
             if (dmg != null) dmg.TakeDmgRpc(_dmg, idPlayer);
+        }*/
+
+       var collider = Runner.GetPhysicsScene2D().OverlapCircle(transform.position, _radius , _layerMask).GetComponent<IDamageable>();
+
+        if (collider!= null)
+        {
+            collider.TakeDmgRpc(_dmg, idPlayer);
+            Debug.Log("Le exploto la granada");
+            Debug.Log(idPlayer);
         }
 
         Runner.Despawn(Object);

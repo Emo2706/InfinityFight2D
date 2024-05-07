@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 
 public class Player_Movement
 {
@@ -11,6 +11,7 @@ public class Player_Movement
     float _xAxis = 0f;
     Rigidbody2D _rb;
     public bool jump = true;
+    public event Action<float , int> OnMovement = delegate { };
 
     public Player_Movement(Player player , Rigidbody2D rb)
     {
@@ -36,6 +37,12 @@ public class Player_Movement
     void Move()
     {
         _rb.velocity += Vector2.right * _xAxis * (_speed * 100) * _player.Runner.DeltaTime;
+
+        _player.transform.right = Vector3.right*_xAxis;
+
+        
+
+        OnMovement(_xAxis, _player.playerID);
     }
 
     void LimitSpeed()

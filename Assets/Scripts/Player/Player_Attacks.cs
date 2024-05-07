@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Fusion;
+using System;
 
 public class Player_Attacks
 {
@@ -21,9 +22,12 @@ public class Player_Attacks
     float _offsetX = 0.92f;
     float _laserDuration = 0.05f;
     Laser _laser;
-    Image _grenadeImg;
-
+    
     LineRenderer _lr;
+
+    public event Action OnThrow = delegate { };
+    public event Action OnResetThrow = delegate { };
+    public event Action OnWall = delegate { };
 
     public Player_Attacks(Player player, Grenade grenadePrefab, Wall wall, GameObject shootSpawnpoint, Laser laser, LineRenderer Line)
     {
@@ -37,7 +41,6 @@ public class Player_Attacks
         _wall = wall;
         _shootSpawn = shootSpawnpoint;
         _laser = laser;
-        _grenadeImg = player.grenadeImg;
         _lr = Line;
     }
     public void SetShootDmg(int dmg)
@@ -120,7 +123,7 @@ public class Player_Attacks
 
             _player.grenadesAmount--;
 
-            _grenadeImg.fillAmount = 0;
+            OnThrow();
 
             HudManager.instance.ChangeGrenadesCount(_player.grenadesAmount);
 
@@ -161,6 +164,7 @@ public class Player_Attacks
 
             Wall wallInstance = _player.Runner.Spawn(_wall, _player.transform.position + new Vector3((_offsetX * _player.transform.right.x),0));
             wallInstance.IDPlayer = _player.playerID;
+            OnWall();
            _player.StartCoroutine(ResetWall());
         }
     }

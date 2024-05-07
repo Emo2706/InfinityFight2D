@@ -17,12 +17,14 @@ public class Player : NetworkBehaviour , IDamageable
     public bool hasToShoot = false;
     public bool hasToGrenade = false;
     public bool hasToWall = false;
+    public bool blue = false;
 
     [Header("Variables")]
     public int playerID;
     public int speed;
     [SerializeField] int _hp;
     [SerializeField] int _maxHp;
+    [SerializeField] int _shootDmg;
     public int jumpForce;
     public float shootDistance;
     public float throwForce;
@@ -39,6 +41,7 @@ public class Player : NetworkBehaviour , IDamageable
     Player_Inputs _inputs;
     Player_Collisions _collisions;
     Player_Attacks _attacks;
+    PlayerView _view;
 
     [Header("Spawns")]
     [SerializeField] Grenade _grenadePrefab;
@@ -49,9 +52,9 @@ public class Player : NetworkBehaviour , IDamageable
     [Header("UI")]
     public int grenadesAmount;
     public Image grenadeImg;
+    public Image wallImg;
 
     public Action CurrentSpawnMethod;
-
 
     public override void Spawned()
     {
@@ -63,6 +66,7 @@ public class Player : NetworkBehaviour , IDamageable
         if (!HasStateAuthority) return;
         HudManager.instance.IDPLAYER.text = Id.ToString();
         grenadeImg = HudManager.instance.grenadeImg;
+        wallImg = HudManager.instance.wallImg;
 
         _hp = _maxHp;
         _rb = GetComponent<Rigidbody2D>();
@@ -70,15 +74,20 @@ public class Player : NetworkBehaviour , IDamageable
         _inputs = new Player_Inputs();
         _collisions = new Player_Collisions(_movement);
         _attacks = new Player_Attacks(this, _grenadePrefab, _wallPrefab, ShootSpawnpoint , _laser, _Lr);
+        _view = new PlayerView(this);
         Camera.main.GetComponent<CameraBehaviour>().SetParameters(this.gameObject.transform);
         HudManager.instance.playerRef = this;
         LocalPlayerDataManager.instance.SetLocalPlayer(this);
         EventManager.SubscribeToEvent(EventManager.EventsType.Event_PlayerDies, DespawnMethod);
         EventManager.SubscribeToEvent(EventManager.EventsType.Event_PlayerDies, SpawnTimer);
 
-        _attacks.SetShootDmg(5);
+        _attacks.SetShootDmg(_shootDmg);
 
-        HudManager.instance.ChangeGrenadesCount(grenadesAmount);
+        _attacks.OnThrow += _view.ChangeGrenades;
+        _attacks.OnThrow += _view.DrainFill;
+        _attacks.OnWall += _view.DrainFillWall;
+        _movement.OnMovement += _view.MovementAnimation;
+        
 
         #region Inputs
         _inputs.BlindKeys(KeyCode.Space, new JumpInput(_movement));
@@ -86,6 +95,11 @@ public class Player : NetworkBehaviour , IDamageable
         _inputs.BlindKeys(KeyCode.Mouse1, new GrenadeInput(_attacks));
         _inputs.BlindKeys(KeyCode.E, new WallInput(_attacks));
         #endregion 
+
+        _view.Start();
+        Debug.Log(playerID);
+
+        
 
     }
 
@@ -108,13 +122,18 @@ public class Player : NetworkBehaviour , IDamageable
             keypressed.Execute();
         }
 
-        Vector3 direction = new Vector3(_pointer.mousePos.x - transform.position.x, _pointer.mousePos.y - transform.position.y);
+       /* Vector3 direction = new Vector3(_pointer.mousePos.x - transform.position.x, _pointer.mousePos.y - transform.position.y);
 
-        transform.right = direction;
+        transform.right = direction;*/
 
         if (grenadeImg.fillAmount < 1)
         {
-            grenadeImg.fillAmount += Time.deltaTime / 10;
+            _view.RechargeFill();
+        }
+
+        if (wallImg.fillAmount < 1)
+        {
+            _view.RechargeFillWall();
         }
 
     }
@@ -178,8 +197,8 @@ public class Player : NetworkBehaviour , IDamageable
     void DespawnMethod(params object[] parameters)
     {
         transform.position = new Vector3(-100, 100, transform.position.z);
-        grenadesAmount = 2;
-        HudManager.instance.ChangeGrenadesCount(grenadesAmount);
+        grenadesAmount = 3;
+        _view.ChangeGrenades();
     }
 
     void SpawnTimer(params object[] parameters)

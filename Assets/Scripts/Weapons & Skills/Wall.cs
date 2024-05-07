@@ -14,7 +14,7 @@ public class Wall : NetworkBehaviour, IDamageable
     public void TakeDmgRpc(int dmg , int ID)
     {
         if (IDPlayer == ID) return;
-        _hp -= dmg;
+        Runner.Despawn(Object);
     }
 
     private void Update()
