@@ -35,6 +35,11 @@ public class AudioManager : NetworkBehaviour
         }
     }
 
+    private void Start()
+    {
+        Play(Sounds.Music);
+    }
+
     public void StopAllsounds()
     {
         foreach (var sound in sounds)
@@ -94,5 +99,6 @@ public class AudioManager : NetworkBehaviour
         public const int Grenade = 1;
         public const int BaseDmg = 2;
         public const int Dmg = 3;
+        public const int Music = 4;
     }
 }

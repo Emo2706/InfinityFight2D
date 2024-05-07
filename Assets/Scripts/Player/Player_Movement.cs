@@ -6,7 +6,6 @@ using System;
 public class Player_Movement
 {
     Player _player;
-    int _speed;
     int _jumpForce;
     float _xAxis = 0f;
     Rigidbody2D _rb;
@@ -16,7 +15,6 @@ public class Player_Movement
     public Player_Movement(Player player , Rigidbody2D rb)
     {
         _player = player;
-        _speed = player.speed;
         _jumpForce = player.jumpForce;
         _rb = rb;
     }
@@ -36,11 +34,17 @@ public class Player_Movement
 
     void Move()
     {
-        _rb.velocity += Vector2.right * _xAxis * (_speed * 100) * _player.Runner.DeltaTime;
+        _rb.velocity += Vector2.right * _xAxis * (_player.speed * 100) * _player.Runner.DeltaTime;
 
-        _player.transform.right = Vector3.right*_xAxis;
 
-        
+
+        if (Input.GetKey(KeyCode.A))
+            _player.transform.eulerAngles = new Vector3(0, 180, 0);
+
+
+        if (Input.GetKey(KeyCode.D))
+            _player.transform.eulerAngles = new Vector3(0, 0, 0);
+
 
         OnMovement(_xAxis, _player.playerID);
     }
@@ -49,15 +53,15 @@ public class Player_Movement
     {
         Vector2 vel = _rb.velocity;
 
-        if(vel.x > _speed)
+        if(vel.x > _player.speed)
         {
-            vel.x = _speed;
+            vel.x = _player.speed;
             _rb.velocity = vel;
         }
 
-        else if (vel.x < -_speed)
+        else if (vel.x < -_player.speed)
         {
-            vel.x = -_speed;
+            vel.x = -_player.speed;
             _rb.velocity = vel;
         }
     }

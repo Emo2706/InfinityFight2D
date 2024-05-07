@@ -11,11 +11,8 @@ public class Player_Attacks
     Grenade _grenadePrefab;
     Wall _wall;
     GameObject _shootSpawn;
-    float _shootDistance;
     float _throwForce;
     float _throwUpWardForce;
-    float _throwCooldown;
-    float _wallCooldown;
     bool _throw = true;
     int _shootDmg;
     bool _wallActivate = true;
@@ -32,12 +29,9 @@ public class Player_Attacks
     public Player_Attacks(Player player, Grenade grenadePrefab, Wall wall, GameObject shootSpawnpoint, Laser laser, LineRenderer Line)
     {
         _player = player;
-        _shootDistance = player.shootDistance;
         _grenadePrefab = grenadePrefab;
         _throwForce = player.throwForce;
         _throwUpWardForce = player.throwUpWardForce;
-        _throwCooldown = player.throwCooldown;
-        _wallCooldown = player.wallCooldown;
         _wall = wall;
         _shootSpawn = shootSpawnpoint;
         _laser = laser;
@@ -62,7 +56,7 @@ public class Player_Attacks
 
         Vector2 endpost;
        // _lr.SetPosition(0, _shootSpawn.gameObject.transform.position);
-        var collider =_player.Runner.GetPhysicsScene2D().Raycast(_shootSpawn.gameObject.transform.position, _player.transform.right.normalized, _shootDistance);
+        var collider =_player.Runner.GetPhysicsScene2D().Raycast(_shootSpawn.gameObject.transform.position, _player.transform.right.normalized, _player.shootDistance);
         _player.StartCoroutine(LaserShoot(collider));
         if (collider == true)
         {
@@ -80,7 +74,7 @@ public class Player_Attacks
 
 
         }
-        else endpost = _shootSpawn.gameObject.transform.position + _shootSpawn.gameObject.transform.right * _shootDistance;
+        else endpost = _shootSpawn.gameObject.transform.position + _shootSpawn.gameObject.transform.right * _player.shootDistance;
         //else _lr.SetPosition(1, _shootSpawn.gameObject.transform.position + _shootSpawn.gameObject.transform.right * _shootDistance);
 
         var startPos = new Vector2(_shootSpawn.gameObject.transform.position.x, _shootSpawn.gameObject.transform.position.y);
@@ -144,7 +138,7 @@ public class Player_Attacks
     IEnumerator ResetThrow()
     {
        
-        yield return new WaitForSeconds(_throwCooldown);
+        yield return new WaitForSeconds(_player.throwCooldown);
 
         _throw = true;
     }
@@ -172,7 +166,7 @@ public class Player_Attacks
     
     IEnumerator ResetWall()
     {
-        yield return new WaitForSeconds(_wallCooldown);
+        yield return new WaitForSeconds(_player.wallCooldown);
 
         _wallActivate = true;
     }

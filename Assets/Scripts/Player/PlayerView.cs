@@ -18,7 +18,11 @@ public class PlayerView
     {
         HudManager.instance.ChangeGrenadesCount(_player.grenadesAmount);
 
-        _anim.SetBool("Blue", _player.blue);
+    }
+
+    public void SetColor(bool blue)
+    {
+        _anim.SetBool("Blue", blue);
     }
 
 
@@ -47,15 +51,39 @@ public class PlayerView
         _player.wallImg.fillAmount += Time.deltaTime / _player.wallCooldown;
     }
 
-    public void MovementAnimation(float axis , int playerID)
+    public void MovementAnimation(float axis, int playerID)
     {
-        
+
         if (playerID == 0)
             _anim.SetBool("IsMovingRed", axis != 0);
 
         else if (playerID == 1)
             _anim.SetBool("IsMovingBlue", axis != 0);
 
-        
+    }
+
+    public void SpeedUpEffect()
+    {
+        //Logica
+    }
+
+    public void DmgUpEffect()
+    {
+        //Logica
+    }
+
+    public void WallCooldownDownEffect()
+    {
+        //Logica
+    }
+
+    public void ThrowCooldownDownEffect()
+    {
+        //Logica
+    }
+
+    public void ShootDistanceUpEffect()
+    {
+        //Logica
     }
 }

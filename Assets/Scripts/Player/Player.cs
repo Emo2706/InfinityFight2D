@@ -56,6 +56,14 @@ public class Player : NetworkBehaviour , IDamageable
 
     public Action CurrentSpawnMethod;
 
+    public event Action OnSpeedUp = delegate { };
+    public event Action OnDmgUp = delegate { };
+    public event Action OnThrowCooldownDown = delegate { };
+    public event Action OnShootDistanceUp = delegate { };
+    public event Action OnWallCooldownDown = delegate { };
+
+    List<Action> _buffs = new List<Action>();
+
     public override void Spawned()
     {
         _Lr = GetComponent<LineRenderer>();
@@ -99,8 +107,29 @@ public class Player : NetworkBehaviour , IDamageable
         _view.Start();
         Debug.Log(playerID);
 
-        
+        #region Buffs
 
+        OnSpeedUp += SpeedUp;
+        OnSpeedUp += _view.SpeedUpEffect;
+
+        OnDmgUp += DmgUp;
+        OnDmgUp += _view.DmgUpEffect;
+
+        OnShootDistanceUp += ShootDistanceUp;
+        OnShootDistanceUp += _view.ShootDistanceUpEffect;
+
+        OnThrowCooldownDown += LessThrowCooldown;
+        OnThrowCooldownDown += _view.ThrowCooldownDownEffect;
+
+        OnWallCooldownDown += LessWallCooldown;
+        OnWallCooldownDown += _view.WallCooldownDownEffect;
+
+        _buffs.Add(OnSpeedUp);
+        _buffs.Add(OnDmgUp);
+        _buffs.Add(OnShootDistanceUp);
+        _buffs.Add(OnThrowCooldownDown);
+        _buffs.Add(OnWallCooldownDown);
+        #endregion
     }
 
     /* No se puede con RPC, tira error
@@ -199,6 +228,15 @@ public class Player : NetworkBehaviour , IDamageable
         transform.position = new Vector3(-100, 100, transform.position.z);
         grenadesAmount = 3;
         _view.ChangeGrenades();
+        Buff();
+
+    }
+
+    void Buff()
+    {
+        var chance = UnityEngine.Random.Range(0, _buffs.Count + 1);
+
+        _buffs[chance]();
     }
 
     void SpawnTimer(params object[] parameters)
@@ -206,6 +244,41 @@ public class Player : NetworkBehaviour , IDamageable
         StartCoroutine(CorroutineSpawnTime());
     }
    
+
+    void SpeedUp()
+    {
+        speed += 2;
+
+        Debug.Log("Speed up");
+    }
+
+    void ShootDistanceUp()
+    {
+        shootDistance += 1;
+
+        Debug.Log("Distance up");
+    }
+
+    void LessThrowCooldown()
+    {
+        throwCooldown -= 2;
+
+        Debug.Log("GrenadeCooldown down");
+    }
+
+    void DmgUp()
+    {
+        _attacks.SetShootDmg(_shootDmg+=1);
+
+        Debug.Log("Damage up");
+    }
+
+    void LessWallCooldown()
+    {
+        wallCooldown -= 1;
+
+        Debug.Log("WallCooldown down");
+    }
 
     IEnumerator CorroutineSpawnTime()
     {
@@ -266,11 +339,9 @@ public class Player : NetworkBehaviour , IDamageable
         InGameSpawnMethod();
         CurrentSpawnMethod = InGameSpawnMethod;
         _hp = _maxHp;
-        grenadesAmount = 2;
-        HudManager.instance.ChangeGrenadesCount(grenadesAmount);
+        grenadesAmount = 3;
+        _view.SetColor(blue);
 
-       
-        
     }
 
     
